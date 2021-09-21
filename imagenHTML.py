@@ -64,6 +64,7 @@ class ImagenHtml:
         resized = image.resize((self.ancho,self.alto),Image.ANTIALIAS)
         resized.save(nombre_imagen)
         
+        
         for filtro in self.filtros:
             if filtro == "MIRRORX":             
                 new_list = self.lista

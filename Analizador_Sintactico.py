@@ -1,6 +1,7 @@
 from imagen import Imagen
 from colorama import Fore, Back, Style
 from imagenHTML import ImagenHtml
+from Error import Error
 
 
 class AnalizadorSintactico:
@@ -10,6 +11,7 @@ class AnalizadorSintactico:
 
     def analizar(self, lista):
         listaImagenes = []
+        Errores = []
         
         i = 0
         
@@ -24,6 +26,9 @@ class AnalizadorSintactico:
             lista_celdas = []
             leyendo_celdas = False
             lista_filtros = []
+            foundFila = False
+            foundColumna = False
+    
             
             
             while i < len(lista):
@@ -46,14 +51,17 @@ class AnalizadorSintactico:
                     dim +=1
                     filas = int(lista[i+2].lexema.upper())
                     i += 3
+                    foundFila = True
                     
                 elif lista[i].lexema.upper() == "COLUMNAS":
                     nueva_imagen.columnas = lista[i+2].lexema.upper()
                     dim +=1
                     columnas = int(lista[i+2].lexema.upper())
                     i += 3
+                    foundColumna = True
                 
                 elif lista[i].lexema.upper() == "CELDAS":
+                    
                     leyendo_celdas = True
                     for j1 in range(filas):
                         column = []
@@ -62,16 +70,22 @@ class AnalizadorSintactico:
                         lista_celdas.append(column)
                     i += 2
                 
-                elif lista[i].lexema.upper() == "[" and leyendo_celdas:
+                elif lista[i].lexema.upper() == "[" and leyendo_celdas and dim == 2:
                     fila = int(lista[i+3].lexema)
                     columna = int(lista[i+1].lexema)
-                    
-                    if lista[i+5].lexema.upper() == "TRUE":
-                        lista_celdas[fila][columna] = lista[i+7].lexema
-                    elif lista[i+5].lexema.upper() == "FALSE":
-                        lista_celdas[fila][columna] = "#FFFFFF"
-                    
-                    i += 8
+                
+                    try:
+                                                            
+                        if lista[i+5].lexema.upper() == "TRUE":
+                            lista_celdas[fila][columna] = lista[i+7].lexema
+                        elif lista[i+5].lexema.upper() == "FALSE":
+                            lista_celdas[fila][columna] = "#FFFFFF"
+                            
+                    except IndexError:
+                        Errores.append(Error("Celda (" + str(columna) + ","+ str(fila) +") fuera de rango", None, None))
+                        pass
+
+                    i += 7
                                     
                 elif lista[i].lexema.upper() == "MIRRORX":
                     lista_filtros.append("MIRRORX")
@@ -96,15 +110,21 @@ class AnalizadorSintactico:
                         break
 
                 i += 1
+            
+            if foundColumna is False:
+                Errores.append(Error('Token "COLUMNA" no encontrado', None, None))
+                
+            if foundFila is False:
+                Errores.append(Error('Token "FILA" no encontrado', None, None))
         
-        print("here")
+
         
         for imagen in listaImagenes:
             
             test = ImagenHtml(imagen.get_celdas(),imagen.get_ancho(), imagen.get_alto(),imagen.get_titulo(), imagen.get_filtros())
             test.generarHTML()
             
-        return listaImagenes
+        return (listaImagenes,Errores)
             
             
             # print("Filtros:", imagen.filtros)

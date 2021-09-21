@@ -6,11 +6,15 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.filedialog import askopenfilename
 import os.path
+from tkinter import messagebox
+from reportes import Reportes
 
 from PIL import ImageTk, Image 
 
 cadena = ""
 nombre = ""
+listaErrores = []
+listaTokens = []
 
 def leer(): 
     filename = askopenfilename()
@@ -19,31 +23,70 @@ def leer():
     archivo.close()
     global cadena
     cadena = contenido
+    info = "Se ha leido el archivo: " + filename
+    for widget in fr_info.winfo_children():
+        widget.destroy()
+    label = tk.Label(fr_info, text=info)
+    label.place(x = 10, y = 5)
+    
+    btn_cargar.configure(bg = "sky blue")
     
 def escribir (ruta, contenido):
     archivo = open(ruta, 'w+')
     archivo.write(contenido)
     archivo.close()
     
-
 def analizar():
     scanner = AL()
     analisis = AS()
-    lista = scanner.analizar(cadena)
-    # scanner.impTokens()
-    # scanner.impErrores()
-    lista_imagenes = analisis.analizar(lista)
+    listas = scanner.analizar(cadena)
+    
+    global listaTokens
+    listaTokens = listas[0]
+    
+    global listaErrores
+    listaErrores = listas[1]
+    
+    scanner.impTokens()
+    scanner.impErrores()
+    
+     
+    listaAnalizada = analisis.analizar(listaTokens)
+    lista_imagenes = listaAnalizada[0]
+    
+    for x in listaAnalizada[1]:
+        listaErrores.append(x)
+    
+    leidas = "Se han analizado las imagenes: "
+    for imagen in lista_imagenes:
+        leidas += imagen.titulo
+        leidas += " "
+    
+    for widget in fr_info.winfo_children():
+        widget.destroy()
+    label = tk.Label(fr_info, text=leidas)
+    label.place(x = 10, y = 5)    
     
     nombres = []
     for i in lista_imagenes:
         nombres.append(i.get_titulo().replace('"',""))
     
     cb_imagenes["values"] = nombres
+    
+    btn_analizar.configure(bg = "sky blue")
+
+def reportes():
+    reporte = Reportes(listaTokens, listaErrores)
+    info = reporte.reporteHtml()
+    for widget in fr_info.winfo_children():
+        widget.destroy()
+    label = tk.Label(fr_info, text=info)
+    label.place(x = 10, y = 5)
 
 def seleccionImagen(event):
     global nombre
     nombre = cb_imagenes.get()
-    print(nombre)
+    original()
 
 def original():
     for widget in fr_imagen.winfo_children():
@@ -129,12 +172,14 @@ def doublemirror():
         label.image = img
         label.pack()
 
+def salir():
+    quit()
 
 
 if __name__ == '__main__':
     
     window = tk.Tk()
-    window.geometry("800x600")
+    window.geometry("800x640")
     window.title("Bitxelart")
     window.resizable(width=False, height=False)
     
@@ -144,10 +189,10 @@ if __name__ == '__main__':
     btn_analizar = tk.Button(window, text="Analizar", width=10, command=analizar)
     btn_analizar.place(x = 100, y = 10)
     
-    btn_reportes = tk.Button(window, text="Reportes", width=10)
+    btn_reportes = tk.Button(window, text="Reportes", width=10, command = reportes)
     btn_reportes.place(x = 190, y = 10)
     
-    btn_salir = tk.Button(window, text="Salir", width=10)
+    btn_salir = tk.Button(window, text="Salir", width=10, command=salir)
     btn_salir.place(x = 280, y = 10)
     
     cb_imagenes = ttk.Combobox(window, values=[], width=20, font = "Arial 12 bold")
@@ -164,7 +209,9 @@ if __name__ == '__main__':
     fr_imagen = tk.Frame(fr_main, width=580, height=515, relief=tk.GROOVE, bd=2, bg="#999999")
     fr_imagen.place(x = 175, y = 15)
     
-    
+    fr_info = tk.Frame(window, width=780, height=30, relief=tk.GROOVE, bd=2)
+    fr_info.place(x = 10, y = 600)
+     
     radioValue = tk.IntVar() 
     rdioOne = tk.Radiobutton(fr_filtro, text='Original', width=18, pady=(10), variable=radioValue, value=1, indicatoron=False, command=original, selectcolor="#64b2e7")
     rdioTwo = tk.Radiobutton(fr_filtro, text='MIRRORX', width=18, pady=(10),variable=radioValue, value=2, indicatoron=False, command=mirrorx,selectcolor="#64b2e7") 
@@ -175,6 +222,5 @@ if __name__ == '__main__':
     rdioTwo.grid(column=0, row=1, sticky="W")
     rdioThree.grid(column=0, row=2, sticky="W")
     rdioFour.grid(column=0, row=3, sticky="W")
-    
 
     window.mainloop()

@@ -7,7 +7,7 @@ class AnalizadorLexico:
     
     
     def __init__(self):
-        self.reservadas = ["TITULO", "ANCHO", "ALTO", "FILAS", "COLUMNAS", "CELDAS", "FILTROS"]
+        self.reservadas = ["TITULO", "ANCHO", "ALTO", "FILAS", "COLUMNAS", "CELDAS", "FILTROS", "MIRRORX", "MIRRORY", "DOUBLEMIRROR"]
         self.simbolos = ["@", ";", ",", "=", "{", "}", "[", "]"]
         self.listaTokens = [] 
         self.listaErrores = []
@@ -52,9 +52,7 @@ class AnalizadorLexico:
             self.buffer += caracter 
             self.columna += 1
             self.estado = 7
-            
-            
-        
+
         elif caracter in self.simbolos:
             if caracter == ";":
                 self.agregarToken(str(caracter), "Punto y Coma", self.linea, self.columna)
@@ -73,12 +71,6 @@ class AnalizadorLexico:
                 
             self.buffer = ''
             self.columna+=1
-        
-        # elif caracter in self.simbolos:
-        #     self.agregarToken(caracter,'Simbolo',self.linea,self.columna)
-        #     self.buffer = ''
-        #     self.columna+=1
-    
         
         elif caracter == '\n':
             self.linea += 1
@@ -129,7 +121,8 @@ class AnalizadorLexico:
                 self.i -= 1
             
             else:
-                self.agregarToken(self.buffer, "Cadena", self.linea, self.columna)
+                
+                self.agregar_error(self.buffer, self.linea, self.columna)
                 self.estado = 0
                 self.columna+=1
                 self.i -= 1   
@@ -145,11 +138,9 @@ class AnalizadorLexico:
             self.estado = 0
             self.columna+=1    
     
+    #Simbolos
     def estado5(self, caracter):
-        print("here", caracter)
-        if caracter == "@":
-            self.agregarToken(str(caracter), "Arroba", self.linea, self.columna)
-        elif caracter == ";":
+        if caracter == ";":
             self.agregarToken(str(caracter), "Punto y Coma", self.linea, self.columna)
         elif caracter == ",":
             self.agregarToken(str(caracter), "Coma", self.linea, self.columna)
@@ -168,6 +159,7 @@ class AnalizadorLexico:
         self.columna += 1 
         self.estado = 0
     
+    #Color Hex
     def estado6(self,caracter):
         if (caracter.isalpha() or caracter.isdigit()) and self.contHex < 6:
             self.contHex += 1    
@@ -179,8 +171,9 @@ class AnalizadorLexico:
             self.estado = 0
             self.columna+=1
             self.i -= 1  
-        
-    def estado7(self,caracter):
+    
+    #Arrobas
+    def estado7(self,caracter, final):
         if caracter == "@":
             self.contArroba += 1
             self.buffer +=caracter
@@ -188,13 +181,17 @@ class AnalizadorLexico:
         else:
             if self.contArroba != 3:
                 self.contArroba = 0
-                self.agregar_error(self.buffer,self.linea,self.columna)
                 self.estado = 0
                 self.columna += 1 
+                if final:
+                    pass
+                else:
+                    self.agregar_error(self.buffer,self.linea,self.columna)
             
             else:
                 self.contArroba = 0
                 self.agregarToken(self.buffer, "Arrobas", self.linea, self.columna)
+                print("here")
                 self.estado = 0
                 self.columna+=1  
         
@@ -227,10 +224,15 @@ class AnalizadorLexico:
             elif self.estado == 6:
                 self.estado6(cadena[self.i])
             elif self.estado == 7:
-                self.estado7(cadena[self.i])
+                self.estado7(cadena[self.i], False)
             self.i += 1
+
         
-        return self.listaTokens
+        last = len(self.listaTokens)-1
+        if self.listaTokens[last] != "@@@@":
+            self.listaTokens.append(Token("@@@@","Arrobas", self.listaTokens[last].linea+1, 1))
+        
+        return (self.listaTokens,self.listaErrores)
         
     def impTokens(self):
         x = PrettyTable()

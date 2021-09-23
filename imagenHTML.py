@@ -1,8 +1,5 @@
-from html2image import Html2Image
-
 import imgkit
 from PIL import ImageTk, Image 
-
 
 
 class ImagenHtml:
@@ -18,6 +15,7 @@ class ImagenHtml:
         
     def generarHTML(self):
         self.string=""
+        
         self.string += '''
         
         <table style="border-collapse: collapse; " border="1">
@@ -27,15 +25,13 @@ class ImagenHtml:
         for columna in self.lista:
             self.string +='''
             <tr>
-            '''
-            
+            ''' 
             for j in columna:
                 if str(j) == str("0"):
                     j = "#FFFFFF"
                 self.string +='''
                     <td style="height:50px;width:50px;background-color: ''' +  str(j) +''';">&nbsp;</td>
                 '''
-            
             self.string +='''
             <tr>
             '''
@@ -48,13 +44,12 @@ class ImagenHtml:
         nombre_imagen = str("Imagenes\\" + self.titulo.replace('"', '') + ".png")
         archivo = open(nombre,"w+")
         archivo.write(self.string)
+        archivo.close()
         
         path_wkthmltoimage = r'C:\\Program Files\\wkhtmltopdf\\bin\\wkhtmltoimage.exe'
         config = imgkit.config(wkhtmltoimage=path_wkthmltoimage)
-        
-        
         options = {
-            'crop-w': f'{int(len(self.lista[0]))*50 + 53}',
+            'crop-w': f'{int(len(self.lista[0]))*54}',
             'crop-x': '0',
             'crop-y': '0',
         }
@@ -106,7 +101,7 @@ class ImagenHtml:
                 
                 
                 options = {
-                    'crop-w': f'{int(len(self.lista[0]))*50 + 53}',
+                    'crop-w': f'{int(len(self.lista[0]))*54}',
                     'crop-x': '0',
                     'crop-y': '0',
                 }
@@ -156,7 +151,7 @@ class ImagenHtml:
                 
                 
                 options = {
-                    'crop-w': f'{int(len(self.lista[0]))*50 + 53}',
+                    'crop-w': f'{int(len(self.lista[0]))*54}',
                     'crop-x': '0',
                     'crop-y': '0',
                 }
@@ -206,7 +201,7 @@ class ImagenHtml:
                 
                 
                 options = {
-                    'crop-w': f'{int(len(self.lista[0]))*50 + 53}',
+                    'crop-w': f'{int(len(self.lista[0]))*54}',
                     'crop-x': '0',
                     'crop-y': '0',
                 }

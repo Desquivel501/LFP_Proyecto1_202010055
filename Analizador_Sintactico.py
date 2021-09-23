@@ -16,8 +16,6 @@ class AnalizadorSintactico:
         i = 0
         
         while i < len(lista):
-            # for x in lista:
-            #     print(x.lexema, " ")
 
             nueva_imagen = Imagen(None,None,None,None,None,None,None)
             filas = 0
@@ -32,32 +30,26 @@ class AnalizadorSintactico:
             
             
             while i < len(lista):
-                # print(lista[i].lexema)
                 
                 if lista[i].lexema.upper() == "TITULO":
                     nueva_imagen.titulo = lista[i+2].lexema.upper()
-                    i += 3
                     
                 elif lista[i].lexema.upper() == "ANCHO":
                     nueva_imagen.ancho = lista[i+2].lexema.upper()
-                    i += 3
                     
                 elif lista[i].lexema.upper() == "ALTO":
                     nueva_imagen.alto = lista[i+2].lexema.upper()
-                    i += 3
                     
                 elif lista[i].lexema.upper() == "FILAS":
                     nueva_imagen.filas = lista[i+2].lexema.upper()
                     dim +=1
                     filas = int(lista[i+2].lexema.upper())
-                    i += 3
                     foundFila = True
                     
                 elif lista[i].lexema.upper() == "COLUMNAS":
                     nueva_imagen.columnas = lista[i+2].lexema.upper()
                     dim +=1
                     columnas = int(lista[i+2].lexema.upper())
-                    i += 3
                     foundColumna = True
                 
                 elif lista[i].lexema.upper() == "CELDAS":
@@ -68,7 +60,6 @@ class AnalizadorSintactico:
                         for i1 in range(columnas):
                             column.append(0)
                         lista_celdas.append(column)
-                    i += 2
                 
                 elif lista[i].lexema.upper() == "[" and leyendo_celdas and dim == 2:
                     fila = int(lista[i+3].lexema)
@@ -84,8 +75,6 @@ class AnalizadorSintactico:
                     except IndexError:
                         Errores.append(Error("Celda (" + str(columna) + ","+ str(fila) +") fuera de rango", None, None))
                         pass
-
-                    i += 7
                                     
                 elif lista[i].lexema.upper() == "MIRRORX":
                     lista_filtros.append("MIRRORX")

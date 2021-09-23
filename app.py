@@ -49,8 +49,7 @@ def analizar():
     
     scanner.impTokens()
     scanner.impErrores()
-    
-     
+       
     listaAnalizada = analisis.analizar(listaTokens)
     lista_imagenes = listaAnalizada[0]
     
@@ -198,7 +197,6 @@ if __name__ == '__main__':
     cb_imagenes = ttk.Combobox(window, values=[], width=20, font = "Arial 12 bold")
     cb_imagenes.place(x = 370, y = 10)
     cb_imagenes.bind("<<ComboboxSelected>>", seleccionImagen)
-    
     
     fr_main = tk.Frame(window, width=780, height=545, relief=tk.GROOVE, bd=2)
     fr_main.place(x = 10, y = 45)

@@ -46,12 +46,12 @@ class AnalizadorLexico:
         elif caracter == "#":
             self.buffer += caracter
             self.columna += 1
-            self.estado = 6
+            self.estado = 4
         
         elif caracter == "@":
             self.buffer += caracter 
             self.columna += 1
-            self.estado = 7
+            self.estado = 5
 
         elif caracter in self.simbolos:
             if caracter == ";":
@@ -138,29 +138,8 @@ class AnalizadorLexico:
             self.estado = 0
             self.columna+=1    
     
-    #Simbolos
-    def estado5(self, caracter):
-        if caracter == ";":
-            self.agregarToken(str(caracter), "Punto y Coma", self.linea, self.columna)
-        elif caracter == ",":
-            self.agregarToken(str(caracter), "Coma", self.linea, self.columna)
-        elif caracter == "=":
-            self.agregarToken(str(caracter), "Igual", self.linea, self.columna)
-        elif caracter == "{":
-            self.agregarToken(str(caracter), "Llave Izquierda", self.linea, self.columna)
-        elif caracter == "}":
-            self.agregarToken(str(caracter), "Llave Derecha", self.linea, self.columna)
-        elif caracter == "[":
-            self.agregarToken(str(caracter), "Corchete Izquierdo", self.linea, self.columna)
-        elif caracter == "]":
-            self.agregarToken(str(caracter), "Corchete Derecho", self.linea, self.columna)
-        
-        self.buffer =""
-        self.columna += 1 
-        self.estado = 0
-    
     #Color Hex
-    def estado6(self,caracter):
+    def estado4(self,caracter):
         if (caracter.isalpha() or caracter.isdigit()) and self.contHex < 6:
             self.contHex += 1    
             self.buffer +=caracter
@@ -173,7 +152,7 @@ class AnalizadorLexico:
             self.i -= 1  
     
     #Arrobas
-    def estado7(self,caracter, final):
+    def estado5(self,caracter, final):
         if caracter == "@":
             self.contArroba += 1
             self.buffer +=caracter
@@ -217,14 +196,10 @@ class AnalizadorLexico:
                 self.estado2(cadena[self.i])
             elif self.estado == 3:
                 self.estado3(cadena[self.i])
-            # elif self.estado == 4:
-            #     self.estado4(cadena[self.i])
+            elif self.estado == 4:
+                self.estado4(cadena[self.i])
             elif self.estado == 5:
-                self.estado5(cadena[self.i])
-            elif self.estado == 6:
-                self.estado6(cadena[self.i])
-            elif self.estado == 7:
-                self.estado7(cadena[self.i], False)
+                self.estado5(cadena[self.i], False)
             self.i += 1
 
         
